@@ -1,6 +1,11 @@
 class LinksController < ApplicationController
   before_action :set_link, only: [:show, :edit, :update, :destroy]
 
+  # Exige que o usuário esteja autenticado antes de fazer algo como destruir ou criar links
+  # Apenas index e show podem ser acessadas sem login.
+  before_filter :authenticate_user!, except: [:index, :show]
+
+
   # GET /links
   # GET /links.json
   def index
@@ -14,7 +19,8 @@ class LinksController < ApplicationController
 
   # GET /links/new
   def new
-    @link = Link.new
+    # Associa ao usuário o link criado, não cria um link solto
+    @link = current_user.links.build
   end
 
   # GET /links/1/edit
@@ -24,7 +30,8 @@ class LinksController < ApplicationController
   # POST /links
   # POST /links.json
   def create
-    @link = Link.new(link_params)
+    # Associa ao usuário o link criado, não cria um link solto
+    @link = current_user.links.build(link_params)
 
     respond_to do |format|
       if @link.save
